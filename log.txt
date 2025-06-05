@@ -1,0 +1,37 @@
+2025-06-05T16:02:18.281279500 [File] Stratégie de log changée : Fichier
+2025-06-05T16:02:19.726745200 [File] Dessin enregistré.
+2025-06-05T16:02:24.063650500 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:02:25.466504700 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:03:19.695725200 [File] Stratégie de log changée : Fichier
+2025-06-05T16:03:20.467734200 [File] Début du dessin d'une forme : LINE
+2025-06-05T16:03:24.860495600 [File] Forme sélectionnée : Cercle
+2025-06-05T16:03:26.176258300 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:05:28.657822400 [File] Stratégie de log changée : Fichier
+2025-06-05T16:05:32.020970800 [File] Début du dessin d'une forme : RECTANGLE
+2025-06-05T16:05:32.848203800 [File] Début du dessin d'une forme : RECTANGLE
+2025-06-05T16:05:33.992572800 [File] Dessin enregistré.
+2025-06-05T16:05:35.057187700 [File] Forme sélectionnée : Cercle
+2025-06-05T16:05:35.605635800 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:06:53.305285500 [File] Stratégie de log changée : Fichier
+2025-06-05T16:06:54.546031400 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:06:55.511561400 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:06:58.708409400 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:06:59.183988800 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:06:59.669414800 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:07:00.104512800 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:07:02.069982100 [File] Forme sélectionnée : Ligne
+2025-06-05T16:07:02.544485300 [File] Début du dessin d'une forme : LINE
+2025-06-05T16:07:03.180627200 [File] Début du dessin d'une forme : LINE
+2025-06-05T16:07:04.161900300 [File] Forme sélectionnée : Cercle
+2025-06-05T16:07:04.505018500 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:09:33.187996800 [File] Stratégie de log changée : Fichier
+2025-06-05T16:09:34.174098500 [File] Début du dessin d'une forme : LINE
+2025-06-05T16:09:35.497988900 [File] Forme sélectionnée : Cercle
+2025-06-05T16:09:36.011076400 [File] Début du dessin d'une forme : CIRCLE
+2025-06-05T16:09:37.272849400 [File] Forme sélectionnée : Rectangle
+2025-06-05T16:09:38.027361200 [File] Début du dessin d'une forme : RECTANGLE
+2025-06-05T16:09:39.899139200 [File] Forme sélectionnée : Triangle
+2025-06-05T16:09:40.444218400 [File] Début du dessin d'une forme : TRIANGLE
+2025-06-05T16:37:34.573671 [File] Stratégie de log changée : Fichier
+2025-06-05T16:37:35.194554600 [File] Début du dessin d'une forme : TRIANGLE
+2025-06-05T16:37:35.968938700 [File] Début du dessin d'une forme : TRIANGLE
