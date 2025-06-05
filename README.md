@@ -44,7 +44,8 @@ java -cp ".;bin;lib/mysql-connector-j-9.3.0.jar" HelloFX
 - **DAO**: For saving/loading drawings and logging to the database
 
 ## Authors
-- [Your Name]
+- [Hamdi Boussarsar]
+- [Zahrane Rebhi]
 
 ---
 
