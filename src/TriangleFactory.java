@@ -12,7 +12,8 @@ public class TriangleFactory implements ShapeFactory {
             x - size / 2, y + h / 3, // bottom left
             x + size / 2, y + h / 3  // bottom right
         );
-        triangle.setStyle("-fx-fill: lightgreen; -fx-stroke: black;");
+        triangle.setFill(javafx.scene.paint.Color.LIGHTGOLDENRODYELLOW);
+        triangle.setStroke(javafx.scene.paint.Color.ORANGE);
         return triangle;
     }
 }

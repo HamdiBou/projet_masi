@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
 public class HelloFX extends Application {
     private enum ShapeType { RECTANGLE, CIRCLE, LINE, NODE, EDGE, TRIANGLE }
@@ -24,85 +26,118 @@ public class HelloFX extends Application {
     private Shape previewShape;
 
     private Map<ShapeType, ShapeFactory> factories = new HashMap<>();
-
     private LoggerStrategy logger = new ConsoleLogger();
     private Pane drawingPane;
+    private DrawingDAO drawingDAO = new FileDrawingDAO();
+    private List<Shape> shapes = new ArrayList<>();
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Dessinateur de Formes");
+        try {
+            primaryStage.setTitle("Dessinateur de Formes");
 
-        // Palette de sélection
-        Button rectBtn = new Button("Rectangle");
-        Button circBtn = new Button("Cercle");
-        Button lineBtn = new Button("Ligne");
-        Button triangleBtn = new Button("Triangle");
-        HBox palette = new HBox(10, rectBtn, circBtn, lineBtn, triangleBtn);
-        
-        // Sélecteur de stratégie de log
-        ComboBox<String> logSelector = new ComboBox<>();
-        logSelector.getItems().addAll("Console", "Fichier", "Base de données");
-        logSelector.setValue("Console");
-        logSelector.setOnAction(e -> {
-            switch (logSelector.getValue()) {
-                case "Console":
-                    logger = new ConsoleLogger();
-                    break;
-                case "Fichier":
-                    logger = new FileLogger();
-                    break;
-                case "Base de données":
-                    logger = new DatabaseLogger();
-                    break;
+            // Palette de sélection
+            Button rectBtn = new Button("Rectangle");
+            Button circBtn = new Button("Cercle");
+            Button lineBtn = new Button("Ligne");
+            Button triangleBtn = new Button("Triangle");
+            Button saveBtn = new Button("Save");
+            Button clearBtn = new Button("Clear");
+            HBox palette = new HBox(10, rectBtn, circBtn, lineBtn, triangleBtn, saveBtn, clearBtn);
+
+            // Sélecteur de stratégie de log
+            ComboBox<String> logSelector = new ComboBox<>();
+            logSelector.getItems().addAll("Console", "Fichier", "Base de données");
+            logSelector.setValue("Console");
+            logSelector.setOnAction(e -> {
+                switch (logSelector.getValue()) {
+                    case "Console":
+                        logger = new ConsoleLogger();
+                        break;
+                    case "Fichier":
+                        logger = new FileLogger();
+                        break;
+                    case "Base de données":
+                        logger = new DatabaseLogger();
+                        break;
+                }
+                logger.log("Stratégie de log changée : " + logSelector.getValue());
+            });
+            palette.getChildren().add(logSelector);
+
+            rectBtn.setOnAction(e -> {
+                selectedShape = ShapeType.RECTANGLE;
+                logger.log("Forme sélectionnée : Rectangle");
+            });
+            circBtn.setOnAction(e -> {
+                selectedShape = ShapeType.CIRCLE;
+                logger.log("Forme sélectionnée : Cercle");
+            });
+            lineBtn.setOnAction(e -> {
+                selectedShape = ShapeType.LINE;
+                logger.log("Forme sélectionnée : Ligne");
+            });
+            triangleBtn.setOnAction(e -> {
+                selectedShape = ShapeType.TRIANGLE;
+                logger.log("Forme sélectionnée : Triangle");
+            });
+
+            saveBtn.setOnAction(e -> {
+                try {
+                    drawingDAO.save(shapes);
+                    logger.log("Dessin sauvegardé.");
+                } catch (Exception ex) {
+                    logger.log("Erreur lors de la sauvegarde: " + ex.getMessage());
+                }
+            });
+
+            clearBtn.setOnAction(e -> {
+                drawingPane.getChildren().clear();
+                shapes.clear();
+                logger.log("Dessin effacé.");
+            });
+
+            // Zone de dessin
+            drawingPane = new Pane();
+            drawingPane.setPrefSize(600, 400);
+            drawingPane.setMinSize(600, 400);
+            drawingPane.setMaxSize(600, 400);
+            drawingPane.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2;");
+
+            StackPane drawingContainer = new StackPane(drawingPane);
+            drawingContainer.setPrefSize(600, 400);
+            drawingContainer.setMinSize(600, 400);
+            drawingContainer.setMaxSize(600, 400);
+
+            drawingPane.setOnMousePressed(e -> onMousePressed(e, drawingPane));
+            drawingPane.setOnMouseDragged(e -> onMouseDragged(e, drawingPane));
+            drawingPane.setOnMouseReleased(e -> onMouseReleased(e, drawingPane));
+
+            factories.put(ShapeType.RECTANGLE, new RectangleFactory());
+            factories.put(ShapeType.CIRCLE, new CircleFactory());
+            factories.put(ShapeType.LINE, new LineFactory());
+            factories.put(ShapeType.TRIANGLE, new TriangleFactory());
+
+            // Charger les formes sauvegardées au démarrage
+            try {
+                shapes = drawingDAO.load();
+                if (shapes != null) {
+                    drawingPane.getChildren().addAll(shapes);
+                }
+            } catch (Exception ex) {
+                System.err.println("Erreur lors du chargement des formes: " + ex.getMessage());
+                shapes = new ArrayList<>();
             }
-            logger.log("Stratégie de log changée : " + logSelector.getValue());
-        });
-        palette.getChildren().add(logSelector);
 
-        rectBtn.setOnAction(e -> {
-            selectedShape = ShapeType.RECTANGLE;
-            logger.log("Forme sélectionnée : Rectangle");
-        });
-        circBtn.setOnAction(e -> {
-            selectedShape = ShapeType.CIRCLE;
-            logger.log("Forme sélectionnée : Cercle");
-        });
-        lineBtn.setOnAction(e -> {
-            selectedShape = ShapeType.LINE;
-            logger.log("Forme sélectionnée : Ligne");
-        });
-        triangleBtn.setOnAction(e -> {
-            selectedShape = ShapeType.TRIANGLE;
-            logger.log("Forme sélectionnée : Triangle");
-        });
+            BorderPane root = new BorderPane();
+            root.setTop(palette);
+            root.setCenter(drawingContainer);
 
-        // Zone de dessin
-        drawingPane = new Pane();
-        drawingPane.setPrefSize(600, 400);
-        drawingPane.setMinSize(600, 400);
-        drawingPane.setMaxSize(600, 400);
-        drawingPane.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2;");
-
-        StackPane drawingContainer = new StackPane(drawingPane);
-        drawingContainer.setPrefSize(600, 400);
-        drawingContainer.setMinSize(600, 400);
-        drawingContainer.setMaxSize(600, 400);
-
-        drawingPane.setOnMousePressed(e -> onMousePressed(e, drawingPane));
-        drawingPane.setOnMouseDragged(e -> onMouseDragged(e, drawingPane));
-        drawingPane.setOnMouseReleased(e -> onMouseReleased(e, drawingPane));
-
-        factories.put(ShapeType.RECTANGLE, new RectangleFactory());
-        factories.put(ShapeType.CIRCLE, new CircleFactory());
-        factories.put(ShapeType.LINE, new LineFactory());
-        factories.put(ShapeType.TRIANGLE, new TriangleFactory());
-
-        BorderPane root = new BorderPane();
-        root.setTop(palette);
-        root.setCenter(drawingContainer);
-
-        primaryStage.setScene(new Scene(root, 700, 500));
-        primaryStage.show();
+            primaryStage.setScene(new Scene(root, 700, 500));
+            primaryStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean isInDrawingArea(double x, double y) {
@@ -127,6 +162,7 @@ public class HelloFX extends Application {
         if (factory != null) {
             previewShape = factory.create(startX, startY);
             pane.getChildren().add(previewShape);
+            shapes.add(previewShape); // Ajout à la liste pour DAO
             logger.log("Début du dessin d'une forme : " + selectedShape);
         }
     }
@@ -163,8 +199,7 @@ public class HelloFX extends Application {
                     startX - size / 2, startY + h / 3,
                     startX + size / 2, startY + h / 3
                 );
-                break;
-            case NODE:
+                break;            case NODE:
             case EDGE:
                 break;
         }
@@ -174,64 +209,16 @@ public class HelloFX extends Application {
         previewShape = null;
     }
 
+    @Override
+    public void stop() {
+        try {
+            drawingDAO.save(shapes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         launch(args);
-    }
-}
-
-interface ShapeFactory {
-    Shape create(double x, double y);
-}
-
-class RectangleFactory implements ShapeFactory {
-    @Override
-    public Shape create(double x, double y) {
-        return new Rectangle(x, y, 0, 0);
-    }
-}
-
-class CircleFactory implements ShapeFactory {
-    @Override
-    public Shape create(double x, double y) {
-        return new Circle(x, y, 0);
-    }
-}
-
-class LineFactory implements ShapeFactory {
-    @Override
-    public Shape create(double x, double y) {
-        return new Line(x, y, x, y);
-    }
-}
-
-class TriangleFactory implements ShapeFactory {
-    @Override
-    public Shape create(double x, double y) {
-        return new Polygon();
-    }
-}
-
-interface LoggerStrategy {
-    void log(String message);
-}
-
-class ConsoleLogger implements LoggerStrategy {
-    @Override
-    public void log(String message) {
-        System.out.println(message);
-    }
-}
-
-class FileLogger implements LoggerStrategy {
-    @Override
-    public void log(String message) {
-        // Implémentation pour la journalisation dans un fichier
-    }
-}
-
-class DatabaseLogger implements LoggerStrategy {
-    @Override
-    public void log(String message) {
-        // Implémentation pour la journalisation dans une base de données
     }
 }

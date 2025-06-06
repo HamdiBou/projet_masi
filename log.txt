@@ -35,3 +35,33 @@
 2025-06-05T16:37:34.573671 [File] Stratégie de log changée : Fichier
 2025-06-05T16:37:35.194554600 [File] Début du dessin d'une forme : TRIANGLE
 2025-06-05T16:37:35.968938700 [File] Début du dessin d'une forme : TRIANGLE
+2025-06-06T10:12:45.684072800 [File] Stratégie de log changée : Fichier
+2025-06-06T10:12:52.894237700 [File] Forme sélectionnée : Rectangle
+2025-06-06T10:12:53.539189300 [File] Début du dessin d'une forme : RECTANGLE
+2025-06-06T10:12:54.654222600 [File] Forme sélectionnée : Ligne
+2025-06-06T10:12:55.299230100 [File] Début du dessin d'une forme : LINE
+2025-06-06T10:12:56.699679700 [File] Début du dessin d'une forme : LINE
+2025-06-06T10:32:43.246877400 [File] Stratégie de log changée : Fichier
+2025-06-06T10:36:35.011688300 [File] Stratégie de log changée : Fichier
+2025-06-06T10:36:36.162788600 [File] Début du dessin d'une forme : TRIANGLE
+2025-06-06T10:36:38.089821400 [File] Forme sélectionnée : Cercle
+2025-06-06T10:36:38.782573100 [File] Début du dessin d'une forme : CIRCLE
+2025-06-06T10:36:39.803733900 [File] Forme sélectionnée : Rectangle
+2025-06-06T10:36:40.863292800 [File] Début du dessin d'une forme : RECTANGLE
+2025-06-06T10:36:41.201950200 [File] Début du dessin d'une forme : RECTANGLE
+2025-06-06T10:36:42.874046700 [File] Forme sélectionnée : Ligne
+2025-06-06T10:36:43.590226 [File] Début du dessin d'une forme : LINE
+2025-06-06T10:36:44.547275 [File] Début du dessin d'une forme : LINE
+2025-06-06T10:36:45.551735800 [File] Début du dessin d'une forme : LINE
+2025-06-06T10:36:58.036235600 [File] Début du dessin d'une forme : LINE
+2025-06-06T11:53:35.716120100 [File] Stratégie de log changée : Fichier
+2025-06-06T11:53:37.488531 [File] Forme sélectionnée : Triangle
+2025-06-06T11:53:37.870458700 [File] Début du dessin d'une forme : TRIANGLE
+2025-06-06T11:53:39.385860200 [File] Forme sélectionnée : Cercle
+2025-06-06T11:53:39.811050800 [File] Début du dessin d'une forme : CIRCLE
+2025-06-06T11:53:41.639585600 [File] Forme sélectionnée : Triangle
+2025-06-06T11:53:42.156852400 [File] Début du dessin d'une forme : TRIANGLE
+2025-06-06T11:53:43.400338400 [File] Début du dessin d'une forme : TRIANGLE
+2025-06-06T11:53:47.757832200 [File] Forme sélectionnée : Rectangle
+2025-06-06T11:53:48.371666900 [File] Début du dessin d'une forme : RECTANGLE
+2025-06-06T11:53:50.477077300 [File] Dessin sauvegardé.
