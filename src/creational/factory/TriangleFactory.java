@@ -2,6 +2,8 @@ package creational.factory;
 
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
+import structural.decorator.BorderShapeDecorator;
+import javafx.scene.paint.Color;
 
 public class TriangleFactory implements ShapeFactory {
     @Override
@@ -14,8 +16,10 @@ public class TriangleFactory implements ShapeFactory {
             x - size / 2, y + h / 3, // bottom left
             x + size / 2, y + h / 3  // bottom right
         );
-        triangle.setFill(javafx.scene.paint.Color.LIGHTGOLDENRODYELLOW);
-        triangle.setStroke(javafx.scene.paint.Color.ORANGE);
-        return triangle;
+        triangle.setFill(Color.LIGHTGOLDENRODYELLOW);
+        triangle.setStroke(Color.ORANGE);
+        // Decorate with border
+        BorderShapeDecorator decorator = new BorderShapeDecorator(triangle, Color.RED, 3);
+        return decorator.getDecoratedShape();
     }
 }

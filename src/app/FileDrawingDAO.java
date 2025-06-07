@@ -7,6 +7,8 @@ import javafx.scene.shape.Line;
 import java.io.*;
 import java.util.*;
 import creational.singleton.AppConfig;
+import structural.decorator.BorderShapeDecorator;
+import javafx.scene.paint.Color;
 
 public class FileDrawingDAO implements DrawingDAO {
     private String filename = AppConfig.getInstance().getDefaultDrawingFile();
@@ -15,14 +17,17 @@ public class FileDrawingDAO implements DrawingDAO {
     public void save(List<Shape> shapes) throws Exception {
         try (PrintWriter pw = new PrintWriter(new FileWriter(filename))) {
             for (Shape s : shapes) {
-                if (s instanceof Rectangle) {
-                    Rectangle r = (Rectangle) s;
+                // Decorate all shapes before saving (for demonstration, add a blue border)
+                BorderShapeDecorator decorator = new BorderShapeDecorator(s, Color.BLUE, 2);
+                Shape decorated = decorator.getDecoratedShape();
+                if (decorated instanceof Rectangle) {
+                    Rectangle r = (Rectangle) decorated;
                     pw.printf("RECT %.2f %.2f %.2f %.2f\n", r.getX(), r.getY(), r.getWidth(), r.getHeight());
-                } else if (s instanceof Circle) {
-                    Circle c = (Circle) s;
+                } else if (decorated instanceof Circle) {
+                    Circle c = (Circle) decorated;
                     pw.printf("CIRC %.2f %.2f %.2f\n", c.getCenterX(), c.getCenterY(), c.getRadius());
-                } else if (s instanceof Line) {
-                    Line l = (Line) s;
+                } else if (decorated instanceof Line) {
+                    Line l = (Line) decorated;
                     pw.printf("LINE %.2f %.2f %.2f %.2f\n", l.getStartX(), l.getStartY(), l.getEndX(), l.getEndY());
                 }
             }

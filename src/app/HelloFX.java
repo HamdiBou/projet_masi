@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
@@ -30,6 +31,8 @@ import behavioral.strategy.LoggerStrategy;
 import behavioral.strategy.ConsoleLogger;
 import behavioral.strategy.FileLogger;
 import behavioral.strategy.DatabaseLogger;
+import structural.decorator.BorderShapeDecorator;
+import structural.decorator.ShadowShapeDecorator;
 
 public class HelloFX extends Application {
     private enum ShapeType { RECTANGLE, CIRCLE, LINE, NODE, EDGE, TRIANGLE }
@@ -55,7 +58,10 @@ public class HelloFX extends Application {
             Button triangleBtn = new Button("Triangle");
             Button saveBtn = new Button("Save");
             Button clearBtn = new Button("Clear");
-            HBox palette = new HBox(10, rectBtn, circBtn, lineBtn, triangleBtn, saveBtn, clearBtn);
+            ComboBox<String> decoratorSelector = new ComboBox<>();
+            decoratorSelector.getItems().addAll("Aucun", "Bordure", "Ombre", "Bordure + Ombre");
+            decoratorSelector.setValue("Aucun");
+            HBox palette = new HBox(10, rectBtn, circBtn, lineBtn, triangleBtn, saveBtn, clearBtn, decoratorSelector);
 
             // Sélecteur de stratégie de log
             ComboBox<String> logSelector = new ComboBox<>();
@@ -173,6 +179,22 @@ public class HelloFX extends Application {
         ShapeFactory factory = factories.get(selectedShape);
         if (factory != null) {
             previewShape = factory.create(startX, startY);
+            // Set default fill and stroke to black (plain)
+            previewShape.setFill(Color.BLACK);
+            previewShape.setStroke(Color.BLACK);
+            // Apply decorator based on user selection
+            String decoratorChoice = ((ComboBox<String>) ((HBox) ((BorderPane) pane.getParent().getParent()).getTop()).getChildren().get(6)).getValue();
+            if ("Bordure".equals(decoratorChoice)) {
+                BorderShapeDecorator decorator = new BorderShapeDecorator(previewShape, Color.RED, 3);
+                previewShape = decorator.getDecoratedShape();
+            } else if ("Ombre".equals(decoratorChoice)) {
+                ShadowShapeDecorator decorator = new ShadowShapeDecorator(previewShape, Color.GRAY, 10);
+                previewShape = decorator.getDecoratedShape();
+            } else if ("Bordure + Ombre".equals(decoratorChoice)) {
+                BorderShapeDecorator borderDecorator = new BorderShapeDecorator(previewShape, Color.RED, 3);
+                ShadowShapeDecorator shadowDecorator = new ShadowShapeDecorator(borderDecorator.getDecoratedShape(), Color.GRAY, 10);
+                previewShape = shadowDecorator.getDecoratedShape();
+            }
             pane.getChildren().add(previewShape);
             shapes.add(previewShape); // Ajout à la liste pour DAO
             logger.log("Début du dessin d'une forme : " + selectedShape);

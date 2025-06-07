@@ -36,7 +36,7 @@ Open a terminal in the project root and run:
 ```powershell
 Get-ChildItem -Recurse -Filter *.java -Path src | ForEach-Object { $_.FullName } | javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin @-
 
-javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin src/app/*.java src/behavioral/strategy/*.java src/creational/factory/*.java
+javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin src/app/*.java src/behavioral/strategy/*.java src/creational/factory/*.java src/creational/singleton/*.java src/structural/decorator/*.java
 
 java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -cp "bin;lib\mysql-connector-j-9.3.0.jar" app.HelloFX
 ```
@@ -45,6 +45,7 @@ java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-
 - **Factory**: For shape creation (RectangleFactory, CircleFactory, etc.)
 - **Strategy**: For logging (ConsoleLogger, FileLogger, DatabaseLogger)
 - **Singleton**: For global application settings & onfiguration
+- **Decorator**: For shape decoration(shadow, border color, etc) 
 - **DAO**: For saving/loading drawings and logging to the database
 
 ## Authors
