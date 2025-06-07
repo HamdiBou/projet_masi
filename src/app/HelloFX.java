@@ -1,20 +1,29 @@
 package app;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
@@ -44,160 +53,305 @@ public class HelloFX extends Application {
     private LoggerStrategy logger = new ConsoleLogger();
     private Pane drawingPane;
     private DrawingDAO drawingDAO = new FileDrawingDAO();
-    private List<Shape> shapes = new ArrayList<>();
+    private List<Shape> shapes = new ArrayList<>();    // Fields for the UI components
+    private ColorPicker fillColorPicker;
+    private ColorPicker strokeColorPicker;
+    private ComboBox<String> decoratorSelector;
+    private Button rectBtn, circBtn, lineBtn, triangleBtn;
 
     @Override
     public void start(Stage primaryStage) {
         try {
-            primaryStage.setTitle("Dessinateur de Formes");
+            primaryStage.setTitle("Drawing Studio");
 
-            // Palette de sélection
-            Button rectBtn = new Button("Rectangle");
-            Button circBtn = new Button("Cercle");
-            Button lineBtn = new Button("Ligne");
-            Button triangleBtn = new Button("Triangle");
-            Button saveBtn = new Button("Save");
-            Button clearBtn = new Button("Clear");
-            ComboBox<String> decoratorSelector = new ComboBox<>();
-            decoratorSelector.getItems().addAll("Aucun", "Bordure", "Ombre", "Bordure + Ombre");
-            decoratorSelector.setValue("Aucun");
-            HBox palette = new HBox(10, rectBtn, circBtn, lineBtn, triangleBtn, saveBtn, clearBtn, decoratorSelector);
-
-            // Sélecteur de stratégie de log
+            // Create a root container
+            BorderPane root = new BorderPane();
+            
+            // Create a sidebar for tools
+            VBox toolSidebar = new VBox(10);
+            toolSidebar.setPadding(new Insets(10));
+            toolSidebar.setPrefWidth(200);
+            toolSidebar.getStyleClass().add("tool-bar");
+            
+            // SHAPES SECTION
+            Label shapesLabel = new Label("SHAPES");
+            shapesLabel.getStyleClass().add("section-title");
+            toolSidebar.getChildren().add(shapesLabel);
+            
+            VBox shapeButtons = new VBox(5);
+            shapeButtons.getStyleClass().add("tool-section");
+            
+            rectBtn = new Button("Rectangle");
+            rectBtn.getStyleClass().addAll("tool-button", "selected");
+            rectBtn.setMaxWidth(Double.MAX_VALUE);
+            rectBtn.setTooltip(new Tooltip("Draw a rectangle (R)"));
+            
+            circBtn = new Button("Circle");
+            circBtn.getStyleClass().add("tool-button");
+            circBtn.setMaxWidth(Double.MAX_VALUE);
+            circBtn.setTooltip(new Tooltip("Draw a circle (C)"));
+            
+            lineBtn = new Button("Line");
+            lineBtn.getStyleClass().add("tool-button");
+            lineBtn.setMaxWidth(Double.MAX_VALUE);
+            lineBtn.setTooltip(new Tooltip("Draw a line (L)"));
+            
+            triangleBtn = new Button("Triangle");
+            triangleBtn.getStyleClass().add("tool-button");
+            triangleBtn.setMaxWidth(Double.MAX_VALUE);
+            triangleBtn.setTooltip(new Tooltip("Draw a triangle (T)"));
+            
+            shapeButtons.getChildren().addAll(rectBtn, circBtn, lineBtn, triangleBtn);
+            toolSidebar.getChildren().add(shapeButtons);
+            
+            // COLOR SECTION
+            toolSidebar.getChildren().add(new Separator());
+            Label colorsLabel = new Label("COLORS");
+            colorsLabel.getStyleClass().add("section-title");
+            toolSidebar.getChildren().add(colorsLabel);
+            
+            VBox colorSection = new VBox(5);
+            colorSection.getStyleClass().add("tool-section");
+            
+            Label fillLabel = new Label("Fill Color:");
+            fillLabel.setTextFill(Color.WHITE);
+            fillColorPicker = new ColorPicker(Color.BLACK);
+            fillColorPicker.setMaxWidth(Double.MAX_VALUE);
+            
+            Label strokeLabel = new Label("Border Color:");
+            strokeLabel.setTextFill(Color.WHITE);
+            strokeColorPicker = new ColorPicker(Color.BLACK);
+            strokeColorPicker.setMaxWidth(Double.MAX_VALUE);
+            
+            colorSection.getChildren().addAll(fillLabel, fillColorPicker, strokeLabel, strokeColorPicker);
+            toolSidebar.getChildren().add(colorSection);
+            
+            // DECORATORS SECTION
+            toolSidebar.getChildren().add(new Separator());
+            Label decoratorsLabel = new Label("DECORATORS");
+            decoratorsLabel.getStyleClass().add("section-title");
+            toolSidebar.getChildren().add(decoratorsLabel);
+            
+            decoratorSelector = new ComboBox<>();
+            decoratorSelector.getItems().addAll("None", "Border", "Shadow", "Border + Shadow");
+            decoratorSelector.setValue("None");
+            decoratorSelector.setMaxWidth(Double.MAX_VALUE);
+            toolSidebar.getChildren().add(decoratorSelector);
+            
+            // LOGGING SECTION
+            toolSidebar.getChildren().add(new Separator());
+            Label logLabel = new Label("LOGGING");
+            logLabel.getStyleClass().add("section-title");
+            toolSidebar.getChildren().add(logLabel);
+            
             ComboBox<String> logSelector = new ComboBox<>();
-            logSelector.getItems().addAll("Console", "Fichier", "Base de données");
+            logSelector.getItems().addAll("Console", "File", "Database");
             logSelector.setValue("Console");
+            logSelector.setMaxWidth(Double.MAX_VALUE);
+            toolSidebar.getChildren().add(logSelector);
+            
+            // ACTION BUTTONS
+            toolSidebar.getChildren().add(new Separator());
+            Label actionsLabel = new Label("ACTIONS");
+            actionsLabel.getStyleClass().add("section-title");
+            toolSidebar.getChildren().add(actionsLabel);
+            
+            Button saveBtn = new Button("Save Drawing");
+            saveBtn.getStyleClass().add("action-button");
+            saveBtn.setMaxWidth(Double.MAX_VALUE);
+            
+            Button clearBtn = new Button("Clear All");
+            clearBtn.getStyleClass().addAll("action-button", "clear-button");
+            clearBtn.setMaxWidth(Double.MAX_VALUE);
+            
+            VBox actionButtons = new VBox(5);
+            actionButtons.getStyleClass().add("tool-section");
+            actionButtons.getChildren().addAll(saveBtn, clearBtn);
+            toolSidebar.getChildren().add(actionButtons);
+            
+            // Create a spacer to push everything up
+            VBox spacer = new VBox();
+            VBox.setVgrow(spacer, Priority.ALWAYS);
+            toolSidebar.getChildren().add(spacer);
+            
+            // Status bar at the bottom of the sidebar
+            Label statusLabel = new Label("Ready");
+            statusLabel.setTextFill(Color.WHITE);
+            statusLabel.setPadding(new Insets(5));
+            HBox statusBar = new HBox(statusLabel);
+            statusBar.getStyleClass().add("status-bar");
+            statusBar.setAlignment(Pos.CENTER_LEFT);
+            toolSidebar.getChildren().add(statusBar);
+            
+            // Set up button event handlers
+            rectBtn.setOnAction(e -> {
+                selectedShape = ShapeType.RECTANGLE;
+                logger.log("Shape selected: Rectangle");
+                updateToolButtons(rectBtn);
+                statusLabel.setText("Drawing Rectangle");
+            });
+            
+            circBtn.setOnAction(e -> {
+                selectedShape = ShapeType.CIRCLE;
+                logger.log("Shape selected: Circle");
+                updateToolButtons(circBtn);
+                statusLabel.setText("Drawing Circle");
+            });
+            
+            lineBtn.setOnAction(e -> {
+                selectedShape = ShapeType.LINE;
+                logger.log("Shape selected: Line");
+                updateToolButtons(lineBtn);
+                statusLabel.setText("Drawing Line");
+            });
+            
+            triangleBtn.setOnAction(e -> {
+                selectedShape = ShapeType.TRIANGLE;
+                logger.log("Shape selected: Triangle");
+                updateToolButtons(triangleBtn);
+                statusLabel.setText("Drawing Triangle");
+            });
+            
+            saveBtn.setOnAction(e -> {
+                try {
+                    drawingDAO.save(shapes);
+                    logger.log("Drawing saved.");
+                    statusLabel.setText("Drawing saved");
+                } catch (Exception ex) {
+                    logger.log("Error during save: " + ex.getMessage());
+                    statusLabel.setText("Error during save");
+                }
+            });
+            
+            clearBtn.setOnAction(e -> {
+                drawingPane.getChildren().clear();
+                shapes.clear();
+                logger.log("Drawing cleared.");
+                statusLabel.setText("Drawing cleared");
+            });
+            
             logSelector.setOnAction(e -> {
                 switch (logSelector.getValue()) {
                     case "Console":
                         logger = new ConsoleLogger();
                         break;
-                    case "Fichier":
+                    case "File":
                         logger = new FileLogger();
                         break;
-                    case "Base de données":
+                    case "Database":
                         logger = new DatabaseLogger();
                         break;
                 }
-                logger.log("Stratégie de log changée : " + logSelector.getValue());
+                logger.log("Log strategy changed: " + logSelector.getValue());
+                statusLabel.setText("Log strategy changed: " + logSelector.getValue());
             });
-            palette.getChildren().add(logSelector);
-
-            rectBtn.setOnAction(e -> {
-                selectedShape = ShapeType.RECTANGLE;
-                logger.log("Forme sélectionnée : Rectangle");
-            });
-            circBtn.setOnAction(e -> {
-                selectedShape = ShapeType.CIRCLE;
-                logger.log("Forme sélectionnée : Cercle");
-            });
-            lineBtn.setOnAction(e -> {
-                selectedShape = ShapeType.LINE;
-                logger.log("Forme sélectionnée : Ligne");
-            });
-            triangleBtn.setOnAction(e -> {
-                selectedShape = ShapeType.TRIANGLE;
-                logger.log("Forme sélectionnée : Triangle");
-            });
-
-            saveBtn.setOnAction(e -> {
-                try {
-                    drawingDAO.save(shapes);
-                    logger.log("Dessin sauvegardé.");
-                } catch (Exception ex) {
-                    logger.log("Erreur lors de la sauvegarde: " + ex.getMessage());
-                }
-            });
-
-            clearBtn.setOnAction(e -> {
-                drawingPane.getChildren().clear();
-                shapes.clear();
-                logger.log("Dessin effacé.");
-            });
-
-            // Zone de dessin
+            
+            // Drawing area
             drawingPane = new Pane();
-            drawingPane.setPrefSize(600, 400);
-            drawingPane.setMinSize(600, 400);
-            drawingPane.setMaxSize(600, 400);
-            drawingPane.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2;");
-
+            drawingPane.setPrefSize(800, 600);
+            drawingPane.getStyleClass().add("drawing-pane");
+            
             StackPane drawingContainer = new StackPane(drawingPane);
-            drawingContainer.setPrefSize(600, 400);
-            drawingContainer.setMinSize(600, 400);
-            drawingContainer.setMaxSize(600, 400);
-
+            drawingContainer.setPadding(new Insets(20));
+            
             drawingPane.setOnMousePressed(e -> onMousePressed(e, drawingPane));
             drawingPane.setOnMouseDragged(e -> onMouseDragged(e, drawingPane));
             drawingPane.setOnMouseReleased(e -> onMouseReleased(e, drawingPane));
-
+            
+            // Set up factories
             factories.put(ShapeType.RECTANGLE, new RectangleFactory());
             factories.put(ShapeType.CIRCLE, new CircleFactory());
             factories.put(ShapeType.LINE, new LineFactory());
             factories.put(ShapeType.TRIANGLE, new TriangleFactory());
-
-            // Charger les formes sauvegardées au démarrage
+            
+            // Load saved shapes
             try {
                 shapes = drawingDAO.load();
                 if (shapes != null) {
                     drawingPane.getChildren().addAll(shapes);
                 }
             } catch (Exception ex) {
-                System.err.println("Erreur lors du chargement des formes: " + ex.getMessage());
+                System.err.println("Error loading shapes: " + ex.getMessage());
                 shapes = new ArrayList<>();
             }
-
-            BorderPane root = new BorderPane();
-            root.setTop(palette);
+            
+            root.setLeft(toolSidebar);
             root.setCenter(drawingContainer);
-
-            primaryStage.setScene(new Scene(root, 700, 500));
+            
+            Scene scene = new Scene(root, 1024, 768);
+            scene.getStylesheets().add(getClass().getResource("/app/resources/styles.css").toExternalForm());
+            
+            // Add keyboard shortcuts
+            scene.setOnKeyPressed(e -> {
+                switch (e.getCode()) {
+                    case R:
+                        rectBtn.fire();
+                        break;
+                    case C:
+                        circBtn.fire();
+                        break;
+                    case L:
+                        lineBtn.fire();
+                        break;
+                    case T:
+                        triangleBtn.fire();
+                        break;
+                    case S:
+                        if (e.isControlDown()) {
+                            saveBtn.fire();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            });
+            
+            primaryStage.setScene(scene);
             primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean isInDrawingArea(double x, double y) {
-        return x >= 0 && y >= 0 && x <= 600 && y <= 400;
-    }
-
-    private void onMousePressed(MouseEvent e, Pane pane) {
+    }    private boolean isInDrawingArea(double x, double y) {
+        // Adjust the drawing area bounds to match our new canvas size
+        return x >= 0 && y >= 0 && x <= drawingPane.getWidth() && y <= drawingPane.getHeight();
+    }private void onMousePressed(MouseEvent e, Pane pane) {
         double x = e.getX();
         double y = e.getY();
         if (!isInDrawingArea(x, y)) return;
         startX = x;
         startY = y;
         if (selectedShape == ShapeType.NODE) {
-            // TODO: Implémenter la création de nœuds
+            // TODO: Implement node creation
             return;
         }
         if (selectedShape == ShapeType.EDGE) {
-            // TODO: Implémenter la création d'arêtes
+            // TODO: Implement edge creation
             return;
         }
         ShapeFactory factory = factories.get(selectedShape);
         if (factory != null) {
             previewShape = factory.create(startX, startY);
-            // Set default fill and stroke to black (plain)
-            previewShape.setFill(Color.BLACK);
-            previewShape.setStroke(Color.BLACK);
+            
+            // Apply the selected fill and stroke colors
+            previewShape.setFill(fillColorPicker.getValue());
+            previewShape.setStroke(strokeColorPicker.getValue());
+            
             // Apply decorator based on user selection
-            String decoratorChoice = ((ComboBox<String>) ((HBox) ((BorderPane) pane.getParent().getParent()).getTop()).getChildren().get(6)).getValue();
-            if ("Bordure".equals(decoratorChoice)) {
-                BorderShapeDecorator decorator = new BorderShapeDecorator(previewShape, Color.RED, 3);
+            String decoratorChoice = decoratorSelector.getValue();
+            if ("Border".equals(decoratorChoice)) {
+                BorderShapeDecorator decorator = new BorderShapeDecorator(previewShape, strokeColorPicker.getValue(), 3);
                 previewShape = decorator.getDecoratedShape();
-            } else if ("Ombre".equals(decoratorChoice)) {
+            } else if ("Shadow".equals(decoratorChoice)) {
                 ShadowShapeDecorator decorator = new ShadowShapeDecorator(previewShape, Color.GRAY, 10);
                 previewShape = decorator.getDecoratedShape();
-            } else if ("Bordure + Ombre".equals(decoratorChoice)) {
-                BorderShapeDecorator borderDecorator = new BorderShapeDecorator(previewShape, Color.RED, 3);
+            } else if ("Border + Shadow".equals(decoratorChoice)) {
+                BorderShapeDecorator borderDecorator = new BorderShapeDecorator(previewShape, strokeColorPicker.getValue(), 3);
                 ShadowShapeDecorator shadowDecorator = new ShadowShapeDecorator(borderDecorator.getDecoratedShape(), Color.GRAY, 10);
                 previewShape = shadowDecorator.getDecoratedShape();
             }
             pane.getChildren().add(previewShape);
-            shapes.add(previewShape); // Ajout à la liste pour DAO
-            logger.log("Début du dessin d'une forme : " + selectedShape);
+            shapes.add(previewShape); // Add to the list for DAO
+            logger.log("Started drawing shape: " + selectedShape);
         }
     }
 
@@ -250,6 +404,18 @@ public class HelloFX extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Updates the visual state of tool buttons to reflect the currently selected tool
+     * @param selectedButton The button that was just selected
+     */
+    private void updateToolButtons(Button selectedButton) {
+        rectBtn.getStyleClass().remove("selected");
+        circBtn.getStyleClass().remove("selected");
+        lineBtn.getStyleClass().remove("selected");
+        triangleBtn.getStyleClass().remove("selected");
+        selectedButton.getStyleClass().add("selected");
     }
 
     public static void main(String[] args) {
