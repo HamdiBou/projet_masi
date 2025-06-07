@@ -45,7 +45,7 @@ java -cp ".;bin;lib/mysql-connector-j-9.3.0.jar" HelloFX
 
 ## Authors
 - [Hamdi Boussarsar]
-- [Zahrane Rebhi]
+- [Zahrane Rabhi]
 
 ---
 
