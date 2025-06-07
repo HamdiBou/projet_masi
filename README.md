@@ -44,6 +44,7 @@ java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-
 ## Design Patterns Used
 - **Factory**: For shape creation (RectangleFactory, CircleFactory, etc.)
 - **Strategy**: For logging (ConsoleLogger, FileLogger, DatabaseLogger)
+- **Singleton**: For global application settings & onfiguration
 - **DAO**: For saving/loading drawings and logging to the database
 
 ## Authors

@@ -6,9 +6,10 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import java.io.*;
 import java.util.*;
+import creational.singleton.AppConfig;
 
 public class FileDrawingDAO implements DrawingDAO {
-    private String filename = "drawing.txt";
+    private String filename = AppConfig.getInstance().getDefaultDrawingFile();
 
     @Override
     public void save(List<Shape> shapes) throws Exception {
