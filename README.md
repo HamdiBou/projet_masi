@@ -34,9 +34,8 @@ A JavaFX application to draw geometric shapes (rectangle, circle, line, triangle
 ## Build & Run
 Open a terminal in the project root and run:
 ```powershell
-javac -cp ".;lib/mysql-connector-j-9.3.0.jar" -d bin src/*.java
-java -cp ".;bin;lib/mysql-connector-j-9.3.0.jar" HelloFX
-```
+javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin src\*.java
+java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -cp "bin;lib\mysql-connector-j-9.3.0.jar" HelloFX```
 
 ## Design Patterns Used
 - **Factory**: For shape creation (RectangleFactory, CircleFactory, etc.)
