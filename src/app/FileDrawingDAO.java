@@ -1,3 +1,5 @@
+package app;
+
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;

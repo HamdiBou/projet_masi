@@ -1,3 +1,5 @@
+package app;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,6 +20,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+
+import creational.factory.ShapeFactory;
+import creational.factory.RectangleFactory;
+import creational.factory.CircleFactory;
+import creational.factory.LineFactory;
+import creational.factory.TriangleFactory;
+import behavioral.strategy.LoggerStrategy;
+import behavioral.strategy.ConsoleLogger;
+import behavioral.strategy.FileLogger;
+import behavioral.strategy.DatabaseLogger;
 
 public class HelloFX extends Application {
     private enum ShapeType { RECTANGLE, CIRCLE, LINE, NODE, EDGE, TRIANGLE }

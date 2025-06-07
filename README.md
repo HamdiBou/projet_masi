@@ -34,8 +34,12 @@ A JavaFX application to draw geometric shapes (rectangle, circle, line, triangle
 ## Build & Run
 Open a terminal in the project root and run:
 ```powershell
-javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin src\*.java
-java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -cp "bin;lib\mysql-connector-j-9.3.0.jar" HelloFX```
+Get-ChildItem -Recurse -Filter *.java -Path src | ForEach-Object { $_.FullName } | javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin @-
+
+javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin src/app/*.java src/behavioral/strategy/*.java src/creational/factory/*.java
+
+java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -cp "bin;lib\mysql-connector-j-9.3.0.jar" app.HelloFX
+```
 
 ## Design Patterns Used
 - **Factory**: For shape creation (RectangleFactory, CircleFactory, etc.)
