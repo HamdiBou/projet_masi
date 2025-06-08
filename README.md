@@ -50,7 +50,7 @@ java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-
 
 ## Authors
 - [Hamdi Boussarsar]
-- [Zahrane Rebhi]
+- [Zahrane Rabhi]
 
 ---
 
