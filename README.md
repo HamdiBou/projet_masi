@@ -32,13 +32,18 @@ A JavaFX application to draw geometric shapes (rectangle, circle, line, triangle
 4. The application uses user `root` and password `root` by default.
 
 ## Build & Run
-Open a terminal in the project root and run:
+Open PowerShell in the project root and run:
 ```powershell
-Get-ChildItem -Recurse -Filter *.java -Path src | ForEach-Object { $_.FullName } | javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin @-
+# Compile all Java files recursively and output to bin
+Get-ChildItem -Recurse -Filter *.java -Path src | ForEach-Object { $_.FullName } | \
+    javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" `
+    --add-modules javafx.controls,javafx.fxml `
+    -d bin -cp "lib\mysql-connector-j-9.3.0.jar"
 
-javac --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -d bin src/app/*.java src/behavioral/strategy/*.java src/creational/factory/*.java src/creational/singleton/*.java src/structural/decorator/*.java
-
-java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" --add-modules javafx.controls,javafx.fxml -cp "bin;lib\mysql-connector-j-9.3.0.jar" app.HelloFX
+# Run the application
+java --module-path "C:\Users\Zahrane\Downloads\openjfx-19.0.2.1_windows-x64_bin-sdk\javafx-sdk-19.0.2.1\lib" `
+    --add-modules javafx.controls,javafx.fxml `
+    -cp "bin;lib\mysql-connector-j-9.3.0.jar" app.HelloFX
 ```
 
 ## Design Patterns Used

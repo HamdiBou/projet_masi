@@ -12,6 +12,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -23,9 +24,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -42,6 +40,11 @@ import behavioral.strategy.FileLogger;
 import behavioral.strategy.DatabaseLogger;
 import structural.decorator.BorderShapeDecorator;
 import structural.decorator.ShadowShapeDecorator;
+import app.graph.Node;
+import app.graph.Edge;
+import app.graph.Graph;
+import javafx.stage.Stage;
+import javafx.scene.text.Text;
 
 public class HelloFX extends Application {
     private enum ShapeType { RECTANGLE, CIRCLE, LINE, NODE, EDGE, TRIANGLE }
@@ -58,6 +61,16 @@ public class HelloFX extends Application {
     private ColorPicker strokeColorPicker;
     private ComboBox<String> decoratorSelector;
     private Button rectBtn, circBtn, lineBtn, triangleBtn;
+    private ComboBox<String> algorithmSelector;
+    private ComboBox<String> sourceSelector;
+    private Node goalNode = null;
+    private Map<Edge, Line> edgeLines = new HashMap<>();
+    private Graph graph = new Graph();
+    private Map<Node, Circle> nodeCircles = new HashMap<>();
+    private Map<Node, Text> nodeLabels = new HashMap<>();
+    private Node firstSelectedNode = null;
+    private int nodeCounter = 0; // NEW: Counter for node labels
+    private boolean goalSelectionMode = false; // NEW: Goal selection mode
 
     @Override
     public void start(Stage primaryStage) {
@@ -77,41 +90,51 @@ public class HelloFX extends Application {
             Label shapesLabel = new Label("SHAPES");
             shapesLabel.getStyleClass().add("section-title");
             toolSidebar.getChildren().add(shapesLabel);
-            
-            VBox shapeButtons = new VBox(5);
-            shapeButtons.getStyleClass().add("tool-section");
-            
+
+            // Initialize all shape buttons
             rectBtn = new Button("Rectangle");
             rectBtn.getStyleClass().addAll("tool-button", "selected");
             rectBtn.setMaxWidth(Double.MAX_VALUE);
             rectBtn.setTooltip(new Tooltip("Draw a rectangle (R)"));
-            
+
             circBtn = new Button("Circle");
             circBtn.getStyleClass().add("tool-button");
             circBtn.setMaxWidth(Double.MAX_VALUE);
             circBtn.setTooltip(new Tooltip("Draw a circle (C)"));
-            
+
             lineBtn = new Button("Line");
             lineBtn.getStyleClass().add("tool-button");
             lineBtn.setMaxWidth(Double.MAX_VALUE);
             lineBtn.setTooltip(new Tooltip("Draw a line (L)"));
-            
+
             triangleBtn = new Button("Triangle");
             triangleBtn.getStyleClass().add("tool-button");
             triangleBtn.setMaxWidth(Double.MAX_VALUE);
             triangleBtn.setTooltip(new Tooltip("Draw a triangle (T)"));
-            
-            shapeButtons.getChildren().addAll(rectBtn, circBtn, lineBtn, triangleBtn);
-            toolSidebar.getChildren().add(shapeButtons);
+
+            // NEW: Node and Edge buttons
+            Button nodeBtn = new Button("Node");
+            nodeBtn.getStyleClass().add("tool-button");
+            nodeBtn.setMaxWidth(Double.MAX_VALUE);
+            nodeBtn.setTooltip(new Tooltip("Place a graph node"));
+
+            Button edgeBtn = new Button("Edge");
+            edgeBtn.getStyleClass().add("tool-button");
+            edgeBtn.setMaxWidth(Double.MAX_VALUE);
+            edgeBtn.setTooltip(new Tooltip("Create an edge between two nodes"));
+
+            HBox shapeButtonsRow1 = new HBox(5, rectBtn, circBtn);
+            HBox shapeButtonsRow2 = new HBox(5, lineBtn, triangleBtn);
+            HBox shapeButtonsRow3 = new HBox(5, nodeBtn, edgeBtn);
+            shapeButtonsRow1.getStyleClass().add("tool-section");
+            shapeButtonsRow2.getStyleClass().add("tool-section");
+            shapeButtonsRow3.getStyleClass().add("tool-section");
+            toolSidebar.getChildren().addAll(shapeButtonsRow1, shapeButtonsRow2, shapeButtonsRow3);
             
             // COLOR SECTION
-            toolSidebar.getChildren().add(new Separator());
             Label colorsLabel = new Label("COLORS");
             colorsLabel.getStyleClass().add("section-title");
             toolSidebar.getChildren().add(colorsLabel);
-            
-            VBox colorSection = new VBox(5);
-            colorSection.getStyleClass().add("tool-section");
             
             Label fillLabel = new Label("Fill Color:");
             fillLabel.setTextFill(Color.WHITE);
@@ -123,8 +146,7 @@ public class HelloFX extends Application {
             strokeColorPicker = new ColorPicker(Color.BLACK);
             strokeColorPicker.setMaxWidth(Double.MAX_VALUE);
             
-            colorSection.getChildren().addAll(fillLabel, fillColorPicker, strokeLabel, strokeColorPicker);
-            toolSidebar.getChildren().add(colorSection);
+            toolSidebar.getChildren().addAll(fillLabel, fillColorPicker, strokeLabel, strokeColorPicker);
             
             // DECORATORS SECTION
             toolSidebar.getChildren().add(new Separator());
@@ -149,6 +171,36 @@ public class HelloFX extends Application {
             logSelector.setValue("Console");
             logSelector.setMaxWidth(Double.MAX_VALUE);
             toolSidebar.getChildren().add(logSelector);
+            
+            // GRAPH SECTION
+            toolSidebar.getChildren().add(new Separator());
+            Label graphLabel = new Label("GRAPH");
+            graphLabel.getStyleClass().add("section-title");
+            toolSidebar.getChildren().add(graphLabel);
+            
+            VBox graphSection = new VBox(5);
+            graphSection.getStyleClass().add("tool-section");
+            
+            algorithmSelector = new ComboBox<>();
+            algorithmSelector.getItems().addAll("DIJKSTRA", "BFS");
+            algorithmSelector.setValue("DIJKSTRA");
+            algorithmSelector.setMaxWidth(Double.MAX_VALUE);
+            
+            Label sourceLabel = new Label("Source Node:");
+            sourceLabel.setTextFill(Color.WHITE);
+            sourceSelector = new ComboBox<>();
+            sourceSelector.setMaxWidth(Double.MAX_VALUE);
+            
+            Button findPathBtn = new Button("Find Shortest Path");
+            findPathBtn.getStyleClass().add("action-button");
+            findPathBtn.setMaxWidth(Double.MAX_VALUE);
+            
+            Button selectGoalBtn = new Button("Select Goal Node");
+            selectGoalBtn.getStyleClass().add("action-button");
+            selectGoalBtn.setMaxWidth(Double.MAX_VALUE);
+            
+            graphSection.getChildren().addAll(algorithmSelector, sourceLabel, sourceSelector, findPathBtn, selectGoalBtn);
+            toolSidebar.getChildren().add(graphSection);
             
             // ACTION BUTTONS
             toolSidebar.getChildren().add(new Separator());
@@ -212,6 +264,16 @@ public class HelloFX extends Application {
                 statusLabel.setText("Drawing Triangle");
             });
             
+            // Add event handlers for nodeBtn and edgeBtn
+            nodeBtn.setOnAction(e -> {
+                selectedShape = ShapeType.NODE;
+                updateToolButtons(nodeBtn);
+            });
+            edgeBtn.setOnAction(e -> {
+                selectedShape = ShapeType.EDGE;
+                updateToolButtons(edgeBtn);
+            });
+            
             saveBtn.setOnAction(e -> {
                 try {
                     drawingDAO.save(shapes);
@@ -226,6 +288,19 @@ public class HelloFX extends Application {
             clearBtn.setOnAction(e -> {
                 drawingPane.getChildren().clear();
                 shapes.clear();
+                // Reset graph model and UI components
+                graph = new Graph();
+                nodeCircles.clear();
+                nodeLabels.clear();
+                edgeLines.clear();
+                firstSelectedNode = null;
+                goalNode = null;
+                sourceSelector.getItems().clear();
+                // Reset node label counter
+                nodeCounter = 0;
+                // NEW: Reset goal node and selection mode
+                goalNode = null;
+                goalSelectionMode = false;
                 logger.log("Drawing cleared.");
                 statusLabel.setText("Drawing cleared");
             });
@@ -246,6 +321,28 @@ public class HelloFX extends Application {
                 statusLabel.setText("Log strategy changed: " + logSelector.getValue());
             });
             
+            selectGoalBtn.setOnAction(e -> {
+                goalSelectionMode = true;
+                statusLabel.setText("Click a node to set as goal node");
+            });
+            
+            findPathBtn.setOnAction(e -> {
+                if (goalNode == null) {
+                    statusLabel.setText("Please select a goal node first");
+                    return;
+                }
+                String algo = algorithmSelector.getValue();
+                app.graph.factory.ShortestPathStrategyFactory.AlgorithmType type = app.graph.factory.ShortestPathStrategyFactory.AlgorithmType.valueOf(algo);
+                app.graph.algorithm.ShortestPathStrategy strat = app.graph.factory.ShortestPathStrategyFactory.getStrategy(type);
+                Node src = graph.getNodes().stream()
+                    .filter(n->n.getId().equals(sourceSelector.getValue())).findFirst().orElse(null);
+                if (src != null && goalNode != null) {
+                    java.util.List<Node> path = strat.findShortestPath(graph, src, goalNode);
+                    highlightPath(path);
+                    statusLabel.setText("Shortest path highlighted in red");
+                }
+            });
+            
             // Drawing area
             drawingPane = new Pane();
             drawingPane.setPrefSize(800, 600);
@@ -257,6 +354,73 @@ public class HelloFX extends Application {
             drawingPane.setOnMousePressed(e -> onMousePressed(e, drawingPane));
             drawingPane.setOnMouseDragged(e -> onMouseDragged(e, drawingPane));
             drawingPane.setOnMouseReleased(e -> onMouseReleased(e, drawingPane));
+            
+            drawingPane.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+                if (selectedShape == ShapeType.NODE) {
+                    double x = evt.getX(), y = evt.getY();
+                    Node modelNode = new Node("N" + (++nodeCounter)); // NEW: Incremental node labeling
+                    graph.addNode(modelNode);
+                    Circle circle = new Circle(x, y, 25, fillColorPicker.getValue());
+                    circle.setStroke(strokeColorPicker.getValue());
+                    circle.setStrokeWidth(2);
+                    Text label = new Text(modelNode.getId());
+                    label.setFill(Color.BLACK);
+                    label.setStyle("-fx-font-weight: bold; -fx-font-size: 12px;");
+                    double textWidth = label.getBoundsInLocal().getWidth();
+                    double textHeight = label.getBoundsInLocal().getHeight();
+                    label.setX(x - textWidth / 2);
+                    label.setY(y + textHeight / 4);
+                    nodeCircles.put(modelNode, circle);
+                    nodeLabels.put(modelNode, label);
+                    drawingPane.getChildren().addAll(circle, label);
+                    circle.setOnMouseClicked(e2 -> {
+                        if (goalSelectionMode) {
+                            // Set this node as the goal node
+                            if (goalNode != null && nodeCircles.containsKey(goalNode)) {
+                                nodeCircles.get(goalNode).setFill(fillColorPicker.getValue()); // reset old goal color
+                            }
+                            goalNode = modelNode;
+                            circle.setFill(Color.ORANGE); // highlight goal node
+                            goalSelectionMode = false;
+                            statusLabel.setText("Goal node set: " + modelNode.getId());
+                            e2.consume();
+                            return;
+                        }
+                        if (selectedShape == ShapeType.EDGE) {
+                            if (firstSelectedNode == null) {
+                                firstSelectedNode = modelNode;
+                                nodeCircles.get(modelNode).setStroke(Color.BLUE);
+                                nodeCircles.get(modelNode).setStrokeWidth(4);
+                            } else if (!firstSelectedNode.equals(modelNode)) {
+                                Node target = modelNode;
+                                double w = Math.hypot(
+                                    nodeCircles.get(firstSelectedNode).getCenterX() - nodeCircles.get(target).getCenterX(),
+                                    nodeCircles.get(firstSelectedNode).getCenterY() - nodeCircles.get(target).getCenterY()
+                                );
+                                graph.addEdge(firstSelectedNode, target, w);
+                                Line line = new Line(
+                                    nodeCircles.get(firstSelectedNode).getCenterX(), nodeCircles.get(firstSelectedNode).getCenterY(),
+                                    nodeCircles.get(target).getCenterX(), nodeCircles.get(target).getCenterY()
+                                );
+                                line.setStroke(strokeColorPicker.getValue());
+                                Edge modelEdge = new Edge(firstSelectedNode, target, w);
+                                edgeLines.put(modelEdge, line);
+                                drawingPane.getChildren().add(0, line);
+                                nodeCircles.get(firstSelectedNode).setStroke(strokeColorPicker.getValue());
+                                nodeCircles.get(firstSelectedNode).setStrokeWidth(2);
+                                firstSelectedNode = null;
+                            }
+                        } else if (selectedShape == ShapeType.NODE) {
+                            // Optionally: select node for shortest path goal
+                        }
+                        e2.consume();
+                    });
+                    sourceSelector.getItems().add(modelNode.getId());
+                    if (sourceSelector.getSelectionModel().isEmpty()) {
+                        sourceSelector.setValue(modelNode.getId());
+                    }
+                }
+            });
             
             // Set up factories
             factories.put(ShapeType.RECTANGLE, new RectangleFactory());
@@ -416,6 +580,35 @@ public class HelloFX extends Application {
         lineBtn.getStyleClass().remove("selected");
         triangleBtn.getStyleClass().remove("selected");
         selectedButton.getStyleClass().add("selected");
+    }
+    // In highlightPath, set edge color to red for the path
+    private void highlightPath(java.util.List<Node> path) {
+        // reset all edges
+        edgeLines.values().forEach(l->l.setStroke(javafx.scene.paint.Color.GRAY));
+        // remove old arrows
+        drawingPane.getChildren().removeIf(n -> n.getUserData() != null && n.getUserData().equals("arrow"));
+        // highlight and add arrow
+        for (int i = 0; i < path.size() - 1; i++) {
+            Node u = path.get(i), v = path.get(i + 1);
+            edgeLines.entrySet().stream()
+                .filter(en -> en.getKey().getSource().equals(u) && en.getKey().getTarget().equals(v))
+                .forEach(en -> {
+                    javafx.scene.shape.Line l = en.getValue();
+                    l.setStroke(javafx.scene.paint.Color.RED);
+                    // arrow head
+                    double ex = l.getEndX(), ey = l.getEndY();
+                    double sx = l.getStartX(), sy = l.getStartY();
+                    double angle = Math.atan2(ey - sy, ex - sx) - Math.PI / 2;
+                    javafx.scene.shape.Polygon arrow = new javafx.scene.shape.Polygon(
+                        ex, ey,
+                        ex + 5 * Math.cos(angle - .3), ey + 5 * Math.sin(angle - .3),
+                        ex + 5 * Math.cos(angle + .3), ey + 5 * Math.sin(angle + .3)
+                    );
+                    arrow.setFill(javafx.scene.paint.Color.RED);
+                    arrow.setUserData("arrow");
+                    drawingPane.getChildren().add(arrow);
+                });
+        }
     }
 
     public static void main(String[] args) {
